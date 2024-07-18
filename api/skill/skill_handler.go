@@ -258,3 +258,27 @@ func (h skillHandler) UpdateTags(c *gin.Context) {
 
 	c.JSON(http.StatusOK, types.MessageResponse("updating tags already in progress"))
 }
+
+func (h skillHandler) DeleteSkill(c *gin.Context) {
+	key := c.Param("key")
+
+	_, err := h.skillStorage.GetSkill(key)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
+		return
+	}
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(DeleteSkillAction, key); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to delete skill"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("deleting skill already in progress"))
+}

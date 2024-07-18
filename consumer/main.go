@@ -8,5 +8,5 @@ import (
 func main() {
 	c := config.Configuration()
 
-	db := database.Postgres(c.PostgresURI)
+	_ = database.Postgres(c.PostgresURI)
 }

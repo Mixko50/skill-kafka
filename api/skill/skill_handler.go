@@ -227,3 +227,34 @@ func (h skillHandler) UpdateLogo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, types.MessageResponse("updating logo already in progress"))
 }
+
+func (h skillHandler) UpdateTags(c *gin.Context) {
+	key := c.Param("key")
+
+	var req UpdateSkillTagsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update tags"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill == nil {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(UpdateTagsAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update tags"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("updating tags already in progress"))
+}

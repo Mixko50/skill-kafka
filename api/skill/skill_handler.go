@@ -95,7 +95,7 @@ func (h skillHandler) CreateSkill(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(CreateSkillAction, nil, req); err != nil {
+	if err := h.skillQueue.PublishSkill(CreateSkillAction, &req.Key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to create skill"))
 		return
@@ -274,7 +274,7 @@ func (h skillHandler) DeleteSkill(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(DeleteSkillAction, nil, key); err != nil {
+	if err := h.skillQueue.PublishSkill(DeleteSkillAction, &key, nil); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to delete skill"))
 		return

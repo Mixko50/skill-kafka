@@ -2,10 +2,12 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/IBM/sarama"
 	"log"
 	"os/signal"
+	"skill-api-kafka-consumer/skill"
 	"syscall"
 )
 
@@ -47,16 +49,31 @@ func (c *Consumer) ClosePartition() {
 	}
 }
 
-func (c *Consumer) Run() {
+func (c *Consumer) Run(h skill.SkillHandler) {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
-	fmt.Printf("Consuming topic %s at %s.", c.topic, c.broker)
+	fmt.Printf("Consuming topic %s at %s.\n", c.topic, c.broker)
 
 ConsumerLoop:
 	for {
 		select {
 		case msg := <-c.partition.Messages():
-			log.Printf("Consumed message offset %d message %q\n", msg.Offset, msg.Value)
+			log.Printf("Consumed message offset %d", msg.Offset)
+
+			var payload *skill.SkillQueuePayload
+
+			err := json.Unmarshal(msg.Value, &payload)
+			if err != nil {
+				log.Printf("Error unmarshalling message: %s, offset: %d", err, msg.Offset)
+				continue
+			}
+
+			if payload == nil {
+				log.Printf("Payload is nil, offset: %d", msg.Offset)
+				continue
+			}
+
+			h.HandleSkill(payload)
 		case <-ctx.Done():
 			log.Print("Shutting down consumer...")
 			break ConsumerLoop

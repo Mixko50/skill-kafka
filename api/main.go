@@ -21,7 +21,7 @@ func main() {
 	c := config.Configuration()
 
 	db := database.Postgres(c.PostgresURI)
-	storage := skill.NewSkillStrage(db)
+	storage := skill.NewSkillStorage(db)
 	producer := kafka.Producer(c.Kafka)
 	queue := skill.NewSkillQueue(producer, c.Kafka)
 

@@ -15,7 +15,7 @@ type SkillStorage interface {
 }
 
 type SkillQueue interface {
-	PublishSkill(action SkillAction, skillPayload interface{}) error
+	PublishSkill(action SkillAction, key *string, skillPayload interface{}) error
 }
 
 type skillHandler struct {
@@ -95,7 +95,7 @@ func (h skillHandler) CreateSkill(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(CreateSkillAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(CreateSkillAction, nil, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to create skill"))
 		return
@@ -122,11 +122,11 @@ func (h skillHandler) UpdateSkill(c *gin.Context) {
 	}
 
 	if skill == nil {
-		c.JSON(http.StatusNotFound, types.ErrorResponse("Skill not found"))
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(UpdateSkillAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(UpdateSkillAction, &key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill"))
 		return
@@ -157,7 +157,7 @@ func (h skillHandler) UpdateName(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(UpdateNameAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(UpdateNameAction, &key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update name"))
 		return
@@ -188,7 +188,7 @@ func (h skillHandler) UpdateDescription(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(UpdateDescAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(UpdateDescAction, &key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update description"))
 		return
@@ -219,7 +219,7 @@ func (h skillHandler) UpdateLogo(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(UpdateLogoAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(UpdateLogoAction, &key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update logo"))
 		return
@@ -250,7 +250,7 @@ func (h skillHandler) UpdateTags(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(UpdateTagsAction, req); err != nil {
+	if err := h.skillQueue.PublishSkill(UpdateTagsAction, &key, req); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update tags"))
 		return
@@ -274,7 +274,7 @@ func (h skillHandler) DeleteSkill(c *gin.Context) {
 		return
 	}
 
-	if err := h.skillQueue.PublishSkill(DeleteSkillAction, key); err != nil {
+	if err := h.skillQueue.PublishSkill(DeleteSkillAction, nil, key); err != nil {
 		log.Println("Error:", err)
 		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to delete skill"))
 		return

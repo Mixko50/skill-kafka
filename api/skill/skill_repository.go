@@ -18,7 +18,7 @@ type skillStorage struct {
 	db *sql.DB
 }
 
-func NewSkillStrage(db *sql.DB) skillStorage {
+func NewSkillStorage(db *sql.DB) skillStorage {
 	return skillStorage{db: db}
 }
 

@@ -20,6 +20,7 @@ const (
 
 type SkillQueuePayload struct {
 	Action  SkillAction `json:"action"`
+	Key     *string     `json:"key"`
 	Payload interface{} `json:"payload"`
 }
 
@@ -35,9 +36,10 @@ func NewSkillQueue(producer sarama.SyncProducer, config config.KafkaConfig) skil
 	}
 }
 
-func (q skillQueue) PublishSkill(action SkillAction, skillPayload interface{}) error {
+func (q skillQueue) PublishSkill(action SkillAction, key *string, skillPayload interface{}) error {
 	payload := SkillQueuePayload{
 		Action:  action,
+		Key:     key,
 		Payload: skillPayload,
 	}
 

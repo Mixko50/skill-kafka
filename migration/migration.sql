@@ -1,0 +1,7 @@
+CREATE TABLE skill (
+	key TEXT PRIMARY KEY,
+	name TEXT NOT NULL DEFAULT '',
+	description TEXT NOT NULL DEFAULT '',
+	logo TEXT NOT NULL DEFAULT '',
+	tags TEXT [] NOT NULL DEFAULT '{}'
+);

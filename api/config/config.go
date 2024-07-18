@@ -12,8 +12,8 @@ type Config struct {
 }
 
 type KafkaConfig struct {
-	KafkaBroker      string
-	CreateSkillTopic string
+	KafkaBroker string
+	SkillTopic  string
 }
 
 func Configuration() Config {
@@ -37,8 +37,8 @@ func Configuration() Config {
 		PostgresURI: os.Getenv("POSTGRES_URI"),
 		Port:        os.Getenv("PORT"),
 		Kafka: KafkaConfig{
-			KafkaBroker:      os.Getenv("KAFKA_BROKER"),
-			CreateSkillTopic: os.Getenv("KAFKA_SKILL_TOPIC"),
+			KafkaBroker: os.Getenv("KAFKA_BROKER"),
+			SkillTopic:  os.Getenv("KAFKA_SKILL_TOPIC"),
 		},
 	}
 }

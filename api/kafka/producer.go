@@ -18,11 +18,11 @@ func Producer(c config.KafkaConfig) sarama.SyncProducer {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer func() {
-		if err := producer.Close(); err != nil {
-			log.Fatalln(err)
-		}
-	}()
+	//defer func() {
+	//	if err := producer.Close(); err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//}()
 
 	// Test
 	msg := &sarama.ProducerMessage{Topic: "my-topic-test", Value: sarama.StringEncoder("testing 123")}

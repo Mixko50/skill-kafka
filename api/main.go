@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"skill-api-kafka/config"
 	"skill-api-kafka/database"
+	"skill-api-kafka/kafka"
 	"skill-api-kafka/skill"
 	"syscall"
 	"time"
@@ -21,7 +22,11 @@ func main() {
 
 	db := database.Postgres(c.PostgresURI)
 	storage := skill.NewSkillStrage(db)
-	r := Router(storage)
+	producer := kafka.Producer(c.Kafka)
+	queue := skill.NewSkillQueue(producer, c.Kafka)
+
+	r := Router(storage, queue)
+
 	defer db.Close()
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -58,9 +63,9 @@ func main() {
 
 }
 
-func Router(storage skill.SkillStorage) *gin.Engine {
+func Router(storage skill.SkillStorage, producer skill.SkillQueue) *gin.Engine {
 	r := gin.Default()
-	h := skill.NewSkillHandler(storage)
+	h := skill.NewSkillHandler(storage, producer)
 
 	v1Group := r.Group("/api/v1")
 	{

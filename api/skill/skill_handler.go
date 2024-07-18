@@ -14,13 +14,19 @@ type SkillStorage interface {
 	GetSkills() ([]Skill, error)
 }
 
-type skillHandler struct {
-	skillStorage SkillStorage
+type SkillQueue interface {
+	PublishSkill(action string, skillPayload interface{}) error
 }
 
-func NewSkillHandler(skillStorage SkillStorage) skillHandler {
+type skillHandler struct {
+	skillStorage SkillStorage
+	skillQueue   SkillQueue
+}
+
+func NewSkillHandler(skillStorage SkillStorage, skillQueue SkillQueue) skillHandler {
 	return skillHandler{
 		skillStorage: skillStorage,
+		skillQueue:   skillQueue,
 	}
 }
 

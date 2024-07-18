@@ -75,7 +75,7 @@ func Router(storage skill.SkillStorage, producer skill.SkillQueue) *gin.Engine {
 		v1Group.PUT("/skills/:key", h.UpdateSkill)
 		v1Group.PATCH("/skills/:key/actions/name", h.UpdateName)
 		v1Group.PATCH("/skills/:key/actions/description", h.UpdateDescription)
-		v1Group.PATCH("/skills/:key/actions/logo")
+		v1Group.PATCH("/skills/:key/actions/logo", h.UpdateLogo)
 		v1Group.PATCH("/skills/:key/actions/tags")
 		v1Group.DELETE("/skills/:key")
 	}

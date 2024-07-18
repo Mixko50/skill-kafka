@@ -196,3 +196,34 @@ func (h skillHandler) UpdateDescription(c *gin.Context) {
 
 	c.JSON(http.StatusOK, types.MessageResponse("updating description already in progress"))
 }
+
+func (h skillHandler) UpdateLogo(c *gin.Context) {
+	key := c.Param("key")
+
+	var req UpdateSkillLogoRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update logo"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill == nil {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(UpdateLogoAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update logo"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("updating logo already in progress"))
+}

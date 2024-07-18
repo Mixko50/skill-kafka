@@ -15,7 +15,7 @@ type SkillStorage interface {
 }
 
 type SkillQueue interface {
-	PublishSkill(action string, skillPayload interface{}) error
+	PublishSkill(action SkillAction, skillPayload interface{}) error
 }
 
 type skillHandler struct {
@@ -73,4 +73,126 @@ func (h skillHandler) GetSkills(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, types.SuccessResponse(skillsMap))
+}
+
+func (h skillHandler) CreateSkill(c *gin.Context) {
+	var req CreateSkillRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to create skill"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(req.Key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill != nil {
+		c.JSON(http.StatusConflict, types.ErrorResponse("Skill already exists"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(CreateSkillAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to create skill"))
+		return
+	}
+
+	c.JSON(http.StatusCreated, types.MessageResponse("creating skill already in progress"))
+}
+
+func (h skillHandler) UpdateSkill(c *gin.Context) {
+	key := c.Param("key")
+
+	var req UpdateSkillRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update skill"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill == nil {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("Skill not found"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(UpdateSkillAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("updating skill already in progress"))
+}
+
+func (h skillHandler) UpdateName(c *gin.Context) {
+	key := c.Param("key")
+
+	var req UpdateSkillNameRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update name"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill == nil {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(UpdateNameAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update name"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("updating name already in progress"))
+}
+
+func (h skillHandler) UpdateDescription(c *gin.Context) {
+	key := c.Param("key")
+
+	var req UpdateSkillDescriptionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update description"))
+		return
+	}
+
+	skill, err := h.skillStorage.GetSkill(key)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to get skill"))
+		return
+	}
+
+	if skill == nil {
+		c.JSON(http.StatusNotFound, types.ErrorResponse("skill not found"))
+		return
+	}
+
+	if err := h.skillQueue.PublishSkill(UpdateDescAction, req); err != nil {
+		log.Println("Error:", err)
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update description"))
+		return
+	}
+
+	c.JSON(http.StatusOK, types.MessageResponse("updating description already in progress"))
 }

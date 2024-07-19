@@ -61,7 +61,7 @@ func TestGetSkillHandler(t *testing.T) {
 			c, r := gin.CreateTestContext(res)
 			c.Request = httptest.NewRequest(http.MethodGet, tt.url, nil)
 
-			h := NewSkillHandler(tt.mockStorage)
+			h := NewSkillHandler(tt.mockStorage, nil)
 			r.GET("/skills/:key", h.GetSkill) // Call to a handler method
 			r.ServeHTTP(res, c.Request)
 
@@ -150,7 +150,7 @@ func TestGetSkillsHandler(t *testing.T) {
 			c, r := gin.CreateTestContext(res)
 			c.Request = httptest.NewRequest(http.MethodGet, tt.url, nil)
 
-			h := NewSkillHandler(tt.mockStorage)
+			h := NewSkillHandler(tt.mockStorage, nil)
 			r.GET("/skills", h.GetSkills) // Call to a handler method
 			r.ServeHTTP(res, c.Request)
 

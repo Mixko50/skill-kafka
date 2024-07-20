@@ -58,22 +58,26 @@ ConsumerLoop:
 	for {
 		select {
 		case msg := <-c.partition.Messages():
-			log.Printf("Consumed message offset %d", msg.Offset)
-
 			var payload *skill.SkillQueuePayload
 
 			err := json.Unmarshal(msg.Value, &payload)
 			if err != nil {
-				log.Printf("Error unmarshalling message: %s, offset: %d", err, msg.Offset)
+				log.Printf("Error unmarshalling message: %s, offset: %d, partition: %d", err, msg.Offset, msg.Partition)
 				continue
 			}
 
 			if payload == nil {
-				log.Printf("Payload is nil, offset: %d", msg.Offset)
+				log.Printf("Payload is nil, offset: %d, partition: %d", msg.Offset, msg.Partition)
 				continue
 			}
 
-			h.HandleSkill(payload)
+			if err := h.HandleSkill(payload); err != nil {
+				log.Printf("Error handling message at topic: %s, partition: %d, offset: %d, error: %s", msg.Topic, msg.Partition, msg.Offset, err)
+				continue
+			}
+
+			log.Printf("Successfully handled message at topic: %s, partition: %d, offset %d", msg.Topic, msg.Partition, msg.Offset)
+
 		case <-ctx.Done():
 			log.Print("Shutting down consumer...")
 			break ConsumerLoop

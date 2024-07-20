@@ -20,30 +20,94 @@ func NewSkillService(skillStorage SkillStorage) skillService {
 	}
 }
 
-func (s skillService) CreateSkill(req CreateSkillRequest) error {
-	return s.skillStorage.CreateSkill(req)
+func (s skillService) CreateSkill(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[CreateSkillRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.CreateSkill(*data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) UpdateSkill(id string, skill UpdateSkillRequest) error {
-	return s.skillStorage.UpdateSkill(id, skill)
+func (s skillService) UpdateSkill(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[UpdateSkillRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.UpdateSkill(*payload.Key, *data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) UpdateName(key string, skill UpdateSkillNameRequest) error {
-	return s.skillStorage.UpdateName(key, skill.Name)
+func (s skillService) UpdateName(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[UpdateSkillNameRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.UpdateName(*payload.Key, data.Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) UpdateDescription(key string, skill UpdateSkillDescriptionRequest) error {
-	return s.skillStorage.UpdateDescription(key, skill.Description)
+func (s skillService) UpdateDescription(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[UpdateSkillDescriptionRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.UpdateDescription(*payload.Key, data.Description)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) UpdateLogo(key string, skill UpdateSkillLogoRequest) error {
-	return s.skillStorage.UpdateLogo(key, skill.Logo)
+func (s skillService) UpdateLogo(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[UpdateSkillLogoRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.UpdateLogo(*payload.Key, data.Logo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) UpdateTags(key string, skill UpdateSkillTagsRequest) error {
-	return s.skillStorage.UpdateTags(key, skill.Tags)
+func (s skillService) UpdateTags(payload SkillQueuePayload) error {
+	data, err := ConvertSkillType[UpdateSkillTagsRequest](payload.Payload)
+	if err != nil {
+		return err
+	}
+
+	err = s.skillStorage.UpdateTags(*payload.Key, data.Tags)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s skillService) DeleteSkill(key string) error {
-	return s.skillStorage.DeleteSkill(key)
+func (s skillService) DeleteSkill(payload SkillQueuePayload) error {
+	err := s.skillStorage.DeleteSkill(*payload.Key)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,5 +1,7 @@
 package skill
 
+import "encoding/json"
+
 type SkillAction string
 
 const (
@@ -47,4 +49,19 @@ type UpdateSkillLogoRequest struct {
 
 type UpdateSkillTagsRequest struct {
 	Tags []string `json:"tags"`
+}
+
+func ConvertSkillType[t UpdateSkillTagsRequest | UpdateSkillLogoRequest | UpdateSkillDescriptionRequest | UpdateSkillNameRequest | UpdateSkillRequest | CreateSkillRequest](skill any) (*t, error) {
+	byteData, err := json.Marshal(skill)
+	if err != nil {
+		return nil, err
+	}
+
+	var payload *t
+	err = json.Unmarshal(byteData, &payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return payload, nil
 }

@@ -5,15 +5,25 @@ import (
 	"fmt"
 )
 
+type SkillService interface {
+	CreateSkill(payload SkillQueuePayload) error
+	UpdateSkill(payload SkillQueuePayload) error
+	UpdateName(payload SkillQueuePayload) error
+	UpdateDescription(payload SkillQueuePayload) error
+	UpdateLogo(payload SkillQueuePayload) error
+	UpdateTags(payload SkillQueuePayload) error
+	DeleteSkill(payload SkillQueuePayload) error
+}
+
 type SkillHandler interface {
 	HandleSkill(payload *SkillQueuePayload) error
 }
 
 type skillHandler struct {
-	skillService skillService
+	skillService SkillService
 }
 
-func NewSkillHandler(skillService skillService) skillHandler {
+func NewSkillHandler(skillService SkillService) skillHandler {
 	return skillHandler{
 		skillService: skillService,
 	}
@@ -47,8 +57,12 @@ func (h skillHandler) HandleSkill(payload *SkillQueuePayload) error {
 	case UpdateTagsAction:
 		err = h.skillService.UpdateTags(*payload)
 	default:
-		err = errors.New(fmt.Sprintf("unknown skill action: %s", payload.Action))
+		return errors.New(fmt.Sprintf("unknown skill action: %s", payload.Action))
 	}
 
-	return err
+	if err != nil {
+		return errors.New(fmt.Sprintf("failed to handle skill action: %s, key: %s, error: %s", payload.Action, *payload.Key, err))
+	}
+
+	return nil
 }

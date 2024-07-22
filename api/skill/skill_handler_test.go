@@ -13,14 +13,18 @@ import (
 	"testing"
 )
 
+type testSkill struct {
+	name           string
+	url            string
+	payload        string
+	expectedStatus int
+	expectedBody   string
+	mockStorage    *mockSkillStorage
+	mockSkillQueue *mockSkillQueue
+}
+
 func TestGetSkillHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-	}{
+	tests := []testSkill{
 		{
 			name:           "get skill success",
 			url:            "/skills/python",
@@ -94,13 +98,7 @@ func TestGetSkillHandler(t *testing.T) {
 }
 
 func TestGetSkillsHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-	}{
+	tests := []testSkill{
 		{
 			name:           "get skills success",
 			url:            "/skills",
@@ -183,15 +181,7 @@ func TestGetSkillsHandler(t *testing.T) {
 }
 
 func TestCreateSkillHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "create skill success",
 			url:            "/skills",
@@ -284,15 +274,7 @@ func TestCreateSkillHandler(t *testing.T) {
 }
 
 func TestUpdateSkillHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "update skill success",
 			url:            "/skills/python",
@@ -391,14 +373,7 @@ func TestUpdateSkillHandler(t *testing.T) {
 }
 
 func TestDeleteSkillHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "delete skill success",
 			url:            "/skills/python",
@@ -483,15 +458,7 @@ func TestDeleteSkillHandler(t *testing.T) {
 }
 
 func TestUpdateSkillNameHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "update skill name success",
 			url:            "/skills/python/name",
@@ -590,15 +557,7 @@ func TestUpdateSkillNameHandler(t *testing.T) {
 }
 
 func TestUpdateSkillDescriptionHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "update skill description success",
 			url:            "/skills/python/description",
@@ -697,15 +656,7 @@ func TestUpdateSkillDescriptionHandler(t *testing.T) {
 }
 
 func TestUpdateSkillLogoHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "update skill logo success",
 			url:            "/skills/python/logo",
@@ -804,15 +755,7 @@ func TestUpdateSkillLogoHandler(t *testing.T) {
 }
 
 func TestUpdateSkillTagsHandler(t *testing.T) {
-	tests := []struct {
-		name           string
-		url            string
-		payload        string
-		expectedStatus int
-		expectedBody   string
-		mockStorage    *mockSkillStorage
-		mockSkillQueue *mockSkillQueue
-	}{
+	tests := []testSkill{
 		{
 			name:           "update skill tags success",
 			url:            "/skills/python/tags",

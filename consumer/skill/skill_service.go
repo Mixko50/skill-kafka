@@ -1,5 +1,10 @@
 package skill
 
+import (
+	"errors"
+	"log"
+)
+
 type SkillStorage interface {
 	CreateSkill(req CreateSkillRequest) error
 	UpdateSkill(id string, skill UpdateSkillRequest) error
@@ -23,7 +28,8 @@ func NewSkillService(skillStorage SkillStorage) skillService {
 func (s skillService) CreateSkill(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[CreateSkillRequest](payload.Payload)
 	if err != nil {
-		return err
+		log.Println(err)
+		return errors.New("failed to convert payload to CreateSkillRequest")
 	}
 
 	err = s.skillStorage.CreateSkill(*data)
@@ -37,7 +43,7 @@ func (s skillService) CreateSkill(payload SkillQueuePayload) error {
 func (s skillService) UpdateSkill(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[UpdateSkillRequest](payload.Payload)
 	if err != nil {
-		return err
+		return errors.New("failed to convert payload to UpdateSkillRequest")
 	}
 
 	err = s.skillStorage.UpdateSkill(*payload.Key, *data)
@@ -51,7 +57,7 @@ func (s skillService) UpdateSkill(payload SkillQueuePayload) error {
 func (s skillService) UpdateName(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[UpdateSkillNameRequest](payload.Payload)
 	if err != nil {
-		return err
+		return errors.New("failed to convert payload to UpdateSkillNameRequest")
 	}
 
 	err = s.skillStorage.UpdateName(*payload.Key, data.Name)
@@ -65,7 +71,7 @@ func (s skillService) UpdateName(payload SkillQueuePayload) error {
 func (s skillService) UpdateDescription(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[UpdateSkillDescriptionRequest](payload.Payload)
 	if err != nil {
-		return err
+		return errors.New("failed to convert payload to UpdateSkillDescriptionRequest")
 	}
 
 	err = s.skillStorage.UpdateDescription(*payload.Key, data.Description)
@@ -79,7 +85,7 @@ func (s skillService) UpdateDescription(payload SkillQueuePayload) error {
 func (s skillService) UpdateLogo(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[UpdateSkillLogoRequest](payload.Payload)
 	if err != nil {
-		return err
+		return errors.New("failed to convert payload to UpdateSkillLogoRequest")
 	}
 
 	err = s.skillStorage.UpdateLogo(*payload.Key, data.Logo)
@@ -93,7 +99,7 @@ func (s skillService) UpdateLogo(payload SkillQueuePayload) error {
 func (s skillService) UpdateTags(payload SkillQueuePayload) error {
 	data, err := ConvertSkillType[UpdateSkillTagsRequest](payload.Payload)
 	if err != nil {
-		return err
+		return errors.New("failed to convert payload to UpdateSkillTagsRequest")
 	}
 
 	err = s.skillStorage.UpdateTags(*payload.Key, data.Tags)

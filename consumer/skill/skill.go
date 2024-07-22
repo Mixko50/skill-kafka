@@ -1,6 +1,9 @@
 package skill
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+)
 
 type SkillAction string
 
@@ -54,6 +57,7 @@ type UpdateSkillTagsRequest struct {
 func ConvertSkillType[t UpdateSkillTagsRequest | UpdateSkillLogoRequest | UpdateSkillDescriptionRequest | UpdateSkillNameRequest | UpdateSkillRequest | CreateSkillRequest](skill any) (*t, error) {
 	byteData, err := json.Marshal(skill)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 

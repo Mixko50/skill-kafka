@@ -221,11 +221,11 @@ func (h skillHandler) UpdateLogo(c *gin.Context) {
 
 	if err := h.skillQueue.PublishSkill(UpdateLogoAction, &key, req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update logo"))
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill logo"))
 		return
 	}
 
-	c.JSON(http.StatusOK, types.MessageResponse("updating logo already in progress"))
+	c.JSON(http.StatusOK, types.MessageResponse("updating skill logo already in progress"))
 }
 
 func (h skillHandler) UpdateTags(c *gin.Context) {

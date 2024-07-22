@@ -190,11 +190,11 @@ func (h skillHandler) UpdateDescription(c *gin.Context) {
 
 	if err := h.skillQueue.PublishSkill(UpdateDescAction, &key, req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update description"))
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill description"))
 		return
 	}
 
-	c.JSON(http.StatusOK, types.MessageResponse("updating description already in progress"))
+	c.JSON(http.StatusOK, types.MessageResponse("updating skill description already in progress"))
 }
 
 func (h skillHandler) UpdateLogo(c *gin.Context) {

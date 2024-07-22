@@ -159,11 +159,11 @@ func (h skillHandler) UpdateName(c *gin.Context) {
 
 	if err := h.skillQueue.PublishSkill(UpdateNameAction, &key, req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update name"))
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill name"))
 		return
 	}
 
-	c.JSON(http.StatusOK, types.MessageResponse("updating name already in progress"))
+	c.JSON(http.StatusOK, types.MessageResponse("updating skill name already in progress"))
 }
 
 func (h skillHandler) UpdateDescription(c *gin.Context) {

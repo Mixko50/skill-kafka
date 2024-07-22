@@ -389,3 +389,95 @@ func TestUpdateSkillHandler(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteSkillHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		url            string
+		expectedStatus int
+		expectedBody   string
+		mockStorage    *mockSkillStorage
+		mockSkillQueue *mockSkillQueue
+	}{
+		{
+			name:           "delete skill success",
+			url:            "/skills/python",
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"status": "success", "message": "deleting skill already in progress"}`,
+			mockStorage: &mockSkillStorage{
+				skill: &Skill{
+					Key: "python",
+				},
+			},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "not exist skill",
+			url:            "/skills/python3",
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   `{"status": "error", "message": "skill not found"}`,
+			mockStorage: &mockSkillStorage{
+				errGet: sql.ErrNoRows,
+			},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "database connection error",
+			url:            "/skills/python4",
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"status": "error", "message": "not be able to get skill"}`,
+			mockStorage: &mockSkillStorage{
+				errGet: sql.ErrConnDone,
+			},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "publish skill error",
+			url:            "/skills/python5",
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"status": "error", "message": "not be able to delete skill"}`,
+			mockStorage: &mockSkillStorage{
+				skill: &Skill{
+					Key: "python5",
+				},
+			},
+			mockSkillQueue: &mockSkillQueue{errPublish: errors.New("publish error")},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			res := httptest.NewRecorder()
+			c, r := gin.CreateTestContext(res)
+			c.Request = httptest.NewRequest(http.MethodDelete, tt.url, nil)
+
+			h := NewSkillHandler(tt.mockStorage, tt.mockSkillQueue)
+			r.DELETE("/skills/:key", h.DeleteSkill) // Call to a handler method
+			r.ServeHTTP(res, c.Request)
+
+			// Assert response
+			if status := res.Code; status != tt.expectedStatus {
+				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.expectedStatus)
+			}
+
+			// Parse and compare JSON
+			var actual, expectedJSON map[string]interface{}
+			err := json.Unmarshal(res.Body.Bytes(), &actual)
+			if err != nil {
+				t.Fatalf("could not unmarshal response body: %v", err)
+			}
+
+			err = json.Unmarshal([]byte(tt.expectedBody), &expectedJSON)
+			if err != nil {
+				t.Fatalf("could not unmarshal expected JSON: %v", err)
+			}
+
+			// Assert response body
+			if !reflect.DeepEqual(expectedJSON, actual) {
+				t.Errorf("handler returned unexpected body: got %v want %v", actual, expectedJSON)
+			}
+		})
+	}
+}

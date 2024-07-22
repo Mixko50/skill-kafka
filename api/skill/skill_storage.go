@@ -2,7 +2,6 @@ package skill
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/lib/pq"
 )
 
@@ -43,7 +42,7 @@ func (s skillStorage) GetSkills() ([]Skill, error) {
 		var skill Skill
 		err := result.Scan(&skill.Key, &skill.Name, &skill.Description, &skill.Logo, &skill.Tags)
 		if err != nil {
-			return make([]Skill, 0), errors.New("fail scaning")
+			return make([]Skill, 0), err
 		}
 		skills = append(skills, skill)
 	}

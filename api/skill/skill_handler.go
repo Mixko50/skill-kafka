@@ -252,11 +252,11 @@ func (h skillHandler) UpdateTags(c *gin.Context) {
 
 	if err := h.skillQueue.PublishSkill(UpdateTagsAction, &key, req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update tags"))
+		c.JSON(http.StatusInternalServerError, types.ErrorResponse("not be able to update skill tags"))
 		return
 	}
 
-	c.JSON(http.StatusOK, types.MessageResponse("updating tags already in progress"))
+	c.JSON(http.StatusOK, types.MessageResponse("updating skill tags already in progress"))
 }
 
 func (h skillHandler) DeleteSkill(c *gin.Context) {

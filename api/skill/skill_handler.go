@@ -79,7 +79,7 @@ func (h skillHandler) CreateSkill(c *gin.Context) {
 	var req CreateSkillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to create skill"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h skillHandler) CreateSkill(c *gin.Context) {
 	}
 
 	if skill != nil {
-		c.JSON(http.StatusConflict, types.ErrorResponse("Skill already exists"))
+		c.JSON(http.StatusConflict, types.ErrorResponse("skill already exists"))
 		return
 	}
 
@@ -110,7 +110,7 @@ func (h skillHandler) UpdateSkill(c *gin.Context) {
 	var req UpdateSkillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update skill"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 
@@ -141,7 +141,7 @@ func (h skillHandler) UpdateName(c *gin.Context) {
 	var req UpdateSkillNameRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update name"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 
@@ -172,7 +172,7 @@ func (h skillHandler) UpdateDescription(c *gin.Context) {
 	var req UpdateSkillDescriptionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update description"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 
@@ -203,7 +203,7 @@ func (h skillHandler) UpdateLogo(c *gin.Context) {
 	var req UpdateSkillLogoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update logo"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 
@@ -234,7 +234,7 @@ func (h skillHandler) UpdateTags(c *gin.Context) {
 	var req UpdateSkillTagsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("Error:", err)
-		c.JSON(http.StatusBadRequest, types.ErrorResponse("not be able to update tags"))
+		c.JSON(http.StatusBadRequest, types.ErrorResponse("invalid request"))
 		return
 	}
 

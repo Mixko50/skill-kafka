@@ -3,10 +3,13 @@ package skill
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -152,6 +155,107 @@ func TestGetSkillsHandler(t *testing.T) {
 
 			h := NewSkillHandler(tt.mockStorage, nil)
 			r.GET("/skills", h.GetSkills) // Call to a handler method
+			r.ServeHTTP(res, c.Request)
+
+			// Assert response
+			if status := res.Code; status != tt.expectedStatus {
+				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.expectedStatus)
+			}
+
+			// Parse and compare JSON
+			var actual, expectedJSON map[string]interface{}
+			err := json.Unmarshal(res.Body.Bytes(), &actual)
+			if err != nil {
+				t.Fatalf("could not unmarshal response body: %v", err)
+			}
+
+			err = json.Unmarshal([]byte(tt.expectedBody), &expectedJSON)
+			if err != nil {
+				t.Fatalf("could not unmarshal expected JSON: %v", err)
+			}
+
+			// Assert response body
+			if !reflect.DeepEqual(expectedJSON, actual) {
+				t.Errorf("handler returned unexpected body: got %v want %v", actual, expectedJSON)
+			}
+		})
+	}
+}
+
+func TestCreateSkillHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		url            string
+		payload        string
+		expectedStatus int
+		expectedBody   string
+		mockStorage    *mockSkillStorage
+		mockSkillQueue *mockSkillQueue
+	}{
+		{
+			name:           "create skill success",
+			url:            "/skills",
+			payload:        `{"key": "python", "name": "Python", "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", "tags": ["programming", "scripting", "web", "data science"]}`,
+			expectedStatus: http.StatusCreated,
+			expectedBody:   `{"status": "success", "message": "creating skill already in progress"}`,
+			mockStorage:    &mockSkillStorage{},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "invalid request",
+			url:            "/skills",
+			payload:        `{"key": "python", "name": "Python", "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png"}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"status": "error", "message": "invalid request"}`,
+			mockStorage:    &mockSkillStorage{},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "skill already exists",
+			url:            "/skills",
+			payload:        `{"key": "python", "name": "Python", "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", "tags": ["programming", "scripting", "web", "data science"]}`,
+			expectedStatus: http.StatusConflict,
+			expectedBody:   `{"status": "error", "message": "skill already exists"}`,
+			mockStorage: &mockSkillStorage{
+				skill: &Skill{
+					Key: "python",
+				},
+			},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "database connection error",
+			url:            "/skills",
+			payload:        `{"key": "python", "name": "Python", "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", "tags": ["programming", "scripting", "web", "data science"]}`,
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"status": "error", "message": "not be able to get skill"}`,
+			mockStorage: &mockSkillStorage{
+				errGet: sql.ErrConnDone,
+			},
+			mockSkillQueue: &mockSkillQueue{},
+		},
+		{
+			name:           "publish skill error",
+			url:            "/skills",
+			payload:        `{"key": "python", "name": "Python", "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png", "tags": ["programming", "scripting", "web", "data science"]}`,
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"status": "error", "message": "not be able to create skill"}`,
+			mockStorage:    &mockSkillStorage{},
+			mockSkillQueue: &mockSkillQueue{errPublish: errors.New("publish error")},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			res := httptest.NewRecorder()
+			c, r := gin.CreateTestContext(res)
+			c.Request = httptest.NewRequest(http.MethodPost, tt.url, nil)
+			c.Request.Body = ioutil.NopCloser(strings.NewReader(tt.payload))
+
+			h := NewSkillHandler(tt.mockStorage, tt.mockSkillQueue)
+			r.POST("/skills", h.CreateSkill) // Call to a handler method
 			r.ServeHTTP(res, c.Request)
 
 			// Assert response

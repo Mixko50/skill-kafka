@@ -5,6 +5,14 @@ import (
 	"github.com/lib/pq"
 )
 
+type Skill struct {
+	Key         string
+	Name        string
+	Description string
+	Logo        string
+	Tags        []string
+}
+
 type skillStorage struct {
 	db *sql.DB
 }

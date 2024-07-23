@@ -5,5 +5,5 @@ COPY . .
 RUN go build -o skill_api
 
 FROM alpine:latest AS runner
-COPY --from=builder /go/src/app .
+COPY --from=builder /go/src/skill_api .
 ENTRYPOINT ["./skill_api"]

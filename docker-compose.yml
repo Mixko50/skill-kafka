@@ -56,10 +56,12 @@ services:
     build:
         context: ./api
         dockerfile: Dockerfile
+    restart: always
     ports:
       - ${SKILL_API_PORT}:8910
     depends_on:
-      - "skill-db"
+      - skill-db
+      - kafka
     environment:
       POSTGRES_URI: ${SKILL_API_POSTGRES_URI}
       PORT: ${SKILL_API_PORT}
@@ -70,11 +72,13 @@ services:
     image: skill-consumer-service:latest
     env_file:
       - .env
+    restart: always
     build:
         context: ./consumer
         dockerfile: Dockerfile
     depends_on:
-      - "kafka"
+      - kafka
+      - skill-db
     environment:
       POSTGRES_URI: ${SKILL_CONSUMER_POSTGRES_URI}
       PORT: ${SKILL_CONSUMER_PORT}

@@ -2,39 +2,39 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT}
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 2181:2181
+      - ${ZOOKEEPER_PORT}:2181
 
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - 9092:9092
-      - 29092:29092
+      - ${KAFKA_PORT}:9092
+      - ${KAFKA_ADVERTISED_PORT}:29092
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
 
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - 8080:8080
+      - ${KAFKA_UI_PORT}:8080
     depends_on:
       - "kafka"
     environment:
-      KAFKA_CLUSTERS_0_NAME: kafka
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-      DYNAMIC_CONFIG_ENABLED: 'true'  # not necessary, added for tests
-      KAFKA_CLUSTERS_0_AUDIT_TOPICAUDITENABLED: 'true'
-      KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: ${KAFKA_CLUSTERS_0_NAME}
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      DYNAMIC_CONFIG_ENABLED: ${DYNAMIC_CONFIG_ENABLED}  # not necessary, added for tests
+      KAFKA_CLUSTERS_0_AUDIT_TOPICAUDITENABLED: ${KAFKA_CLUSTERS_0_AUDIT_TOPICAUDITENABLED}
+      KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED: ${KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED}
 
   skill-db:
     image: postgres:latest
@@ -42,9 +42,41 @@ services:
       - ./migration/migration.sql:/docker-entrypoint-initdb.d/init.sql
       - ./postgres:/var/lib/postgresql
     ports:
-      - 5432:5432
+      - ${SKILL_DB_PORT}:5432
     environment:
-      POSTGRES_HOST: localhost
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: PASSWORD
-      POSTGRES_DB: skill
+      POSTGRES_HOST: ${SKILL_DB_HOST}
+      POSTGRES_USER: ${SKILL_DB_USER}
+      POSTGRES_PASSWORD: ${SKILL_DB_PASSWORD}
+      POSTGRES_DB: ${SKILL_DB_NAME}
+
+  skill-api-service:
+    image: skill-api-service:latest
+    env_file:
+      - .env
+    build:
+        context: ./api
+        dockerfile: Dockerfile
+    ports:
+      - ${SKILL_API_PORT}:8910
+    depends_on:
+      - "skill-db"
+    environment:
+      POSTGRES_URI: ${SKILL_API_POSTGRES_URI}
+      PORT: ${SKILL_API_PORT}
+      KAFKA_BROKER: ${SKILL_API_KAFKA_BROKER}
+      KAFKA_SKILL_TOPIC: ${SKILL_API_KAFKA_SKILL_TOPIC}
+
+  skill-consumer-service:
+    image: skill-consumer-service:latest
+    env_file:
+      - .env
+    build:
+        context: ./consumer
+        dockerfile: Dockerfile
+    depends_on:
+      - "kafka"
+    environment:
+      POSTGRES_URI: ${SKILL_CONSUMER_POSTGRES_URI}
+      PORT: ${SKILL_CONSUMER_PORT}
+      KAFKA_CONSUMER: ${SKILL_CONSUMER_KAFKA_CONSUMER}
+      KAFKA_SKILL_TOPIC: ${SKILL_CONSUMER_KAFKA_SKILL_TOPIC}

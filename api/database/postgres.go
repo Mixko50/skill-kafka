@@ -13,6 +13,10 @@ func Postgres(uri string) *sql.DB {
 	if err != nil {
 		log.Fatal("Fail to Connect to Database")
 	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatal("Fail to Ping Database")
+	}
 	fmt.Println("Connected to Postgres")
 	return db
 }

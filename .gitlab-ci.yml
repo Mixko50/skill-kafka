@@ -1,6 +1,10 @@
+stages:
+  - test
+  - build
+  - deploy
+
 job-run-test:
+  stage: test
   image: golang:alpine
   script:
-    - echo "hello demo job run test"
-    - go version
-    - ls
+    - make tests

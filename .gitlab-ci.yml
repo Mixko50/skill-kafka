@@ -1,3 +1,5 @@
 job-run-test:
+  image: golang:alpine
   script:
     - echo "hello demo job run test"
+    - go test ./... -v -cover

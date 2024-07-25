@@ -3,8 +3,18 @@ stages:
   - build
   - deploy
 
-job-run-test:
+test-skill-api:
   stage: test
   image: golang:latest
   script:
-    - make tests
+    - cd api
+    - go install
+    - make test
+
+test-skill-consumer:
+  stage: test
+  image: golang:latest
+  script:
+    - cd consumer
+    - go install
+    - make test

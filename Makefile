@@ -19,7 +19,7 @@ run-api:
 run-consumer:
 	docker compose up skill-consumer
 
-test:
+tests:
 	@echo "Testing skill-api"
 	@cd api && make test
 	@echo "-----------------------------------------------------------------------"

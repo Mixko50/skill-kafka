@@ -3,6 +3,9 @@ stages:
   - build
   - deploy
 
+variables:
+  REGISTRIES: "registry.gitlab.com/apisit.m2/skill-api-kafka"
+
 test-skill-api:
   stage: test
   image: golang:latest
@@ -18,3 +21,15 @@ test-skill-consumer:
     - cd consumer
     - go install
     - make test
+
+build-skill-api:
+  stage: build
+  needs:
+    - job: test-skill-api
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t $REGISTRIES/skill-api:$SKILL_API_VERSION -f  ./api/Dockerfile ./api
+    - docker tag $REGISTRIES/skill-api:$SKILL_API_VERSION $REGISTRIES/skill-api:latest
+

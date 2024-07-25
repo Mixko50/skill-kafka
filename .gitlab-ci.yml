@@ -28,7 +28,7 @@ build-skill-api:
     - docker:dind
   script:
     - docker build -t $SKILL_API_REGISTRIES:$SKILL_API_VERSION -f  ./api/Dockerfile ./api
-    - docker tag $SKILL_API_REGISTRIES:$SKILL_API_VERSION $SKILL_API_REGISTRIES:skill-api:latest
+    - docker tag $SKILL_API_REGISTRIES:$SKILL_API_VERSION $SKILL_API_REGISTRIES:latest
 
 build-skill-consumer:
   stage: build

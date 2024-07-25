@@ -5,6 +5,6 @@ stages:
 
 job-run-test:
   stage: test
-  image: golang:alpine
+  image: golang:latest
   script:
     - make tests

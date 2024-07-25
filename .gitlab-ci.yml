@@ -28,7 +28,7 @@ build-skill-api:
   services:
     - docker:dind
   script:
-    - make build-ci
+    - ./build-docker-ci.sh
 
 build-skill-consumer:
   stage: build

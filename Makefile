@@ -25,3 +25,6 @@ tests:
 	@echo "-----------------------------------------------------------------------"
 	@echo "Testing skill-consumer"
 	@cd consumer && make test
+
+build-ci:
+	./build-docker-ci.sh

@@ -3,7 +3,6 @@ package skill
 import (
 	"encoding/json"
 	"errors"
-	"log"
 )
 
 type SkillService interface {
@@ -58,8 +57,6 @@ func (h skillHandler) ValidateSkillMessage(msg []byte) (*SkillQueuePayload, erro
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println("payload", payload)
 
 	if payload.Action == "" {
 		return nil, errors.New("action is empty")

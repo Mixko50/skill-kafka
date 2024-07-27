@@ -25,6 +25,9 @@ build-skill-api:
     - job: test-skill-api
   image: docker:latest
   # when: manual
+  only:
+    changes:
+      - api/*
   services:
     - docker:dind
   script:
@@ -36,6 +39,9 @@ build-skill-consumer:
     - job: test-skill-consumer
   image: docker:latest
   # when: manual
+  only:
+    changes:
+      - consumer/*
   services:
     - docker:dind
   script:

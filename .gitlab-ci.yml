@@ -27,7 +27,7 @@ build-skill-api:
   # when: manual
   only:
     changes:
-      - api/*
+      - api/**/*
   services:
     - docker:dind
   script:
@@ -41,7 +41,7 @@ build-skill-consumer:
   # when: manual
   only:
     changes:
-      - consumer/*
+      - consumer/**/*
   services:
     - docker:dind
   script:

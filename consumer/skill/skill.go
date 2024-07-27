@@ -2,6 +2,7 @@ package skill
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 )
 
@@ -15,6 +16,11 @@ const (
 	UpdateDescAction  SkillAction = "update_desc"
 	UpdateLogoAction  SkillAction = "update_logo"
 	UpdateTagsAction  SkillAction = "update_tags"
+)
+
+var (
+	ErrInvalidSkillAction = errors.New("invalid skill action")
+	ErrorInvalidPayload   = errors.New("invalid payload")
 )
 
 type SkillQueuePayload struct {

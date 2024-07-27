@@ -1,8 +1,9 @@
 package skill
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 )
 
 type SkillService interface {
@@ -17,6 +18,7 @@ type SkillService interface {
 
 type SkillHandler interface {
 	HandleSkill(payload *SkillQueuePayload) error
+	ValidateSkillMessage(msg []byte) (*SkillQueuePayload, error)
 }
 
 type skillHandler struct {
@@ -30,39 +32,42 @@ func NewSkillHandler(skillService SkillService) skillHandler {
 }
 
 func (h skillHandler) HandleSkill(payload *SkillQueuePayload) error {
-	var err error
-	if payload.Key == nil {
-		err = errors.New(fmt.Sprintf("cannot handle skill action without key at action: %s", payload.Action))
-		return err
-	}
-
-	if payload.Action == "" {
-		err = errors.New(fmt.Sprintf("cannot handle skill action key: %s without action", *payload.Key))
-		return err
-	}
-
 	switch payload.Action {
 	case CreateSkillAction:
-		err = h.skillService.CreateSkill(*payload)
+		return h.skillService.CreateSkill(*payload)
 	case UpdateSkillAction:
-		err = h.skillService.UpdateSkill(*payload)
+		return h.skillService.UpdateSkill(*payload)
 	case DeleteSkillAction:
-		err = h.skillService.DeleteSkill(*payload)
+		return h.skillService.DeleteSkill(*payload)
 	case UpdateNameAction:
-		err = h.skillService.UpdateName(*payload)
+		return h.skillService.UpdateName(*payload)
 	case UpdateDescAction:
-		err = h.skillService.UpdateDescription(*payload)
+		return h.skillService.UpdateDescription(*payload)
 	case UpdateLogoAction:
-		err = h.skillService.UpdateLogo(*payload)
+		return h.skillService.UpdateLogo(*payload)
 	case UpdateTagsAction:
-		err = h.skillService.UpdateTags(*payload)
+		return h.skillService.UpdateTags(*payload)
 	default:
-		return errors.New(fmt.Sprintf("unknown skill action: %s", payload.Action))
+		return ErrInvalidSkillAction
 	}
+}
 
+func (h skillHandler) ValidateSkillMessage(msg []byte) (*SkillQueuePayload, error) {
+	var payload *SkillQueuePayload
+	err := json.Unmarshal(msg, &payload)
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to handle skill action: %s, key: %s, error: %s", payload.Action, *payload.Key, err))
+		return nil, err
 	}
 
-	return nil
+	log.Println("payload", payload)
+
+	if payload.Action == "" {
+		return nil, errors.New("action is empty")
+	}
+
+	if payload.Key == nil {
+		return nil, errors.New("key is nil")
+	}
+
+	return payload, nil
 }

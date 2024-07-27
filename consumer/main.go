@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
+	"os/signal"
 	"skill-api-kafka-consumer/config"
 	"skill-api-kafka-consumer/database"
 	"skill-api-kafka-consumer/kafka"
 	"skill-api-kafka-consumer/skill"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -27,12 +31,26 @@ func main() {
 	skillHandler := skill.NewSkillHandler(skillService)
 
 	consumer := kafka.NewConsumer(c.Kafka.KafkaConsumer, c.Kafka.SkillTopic)
-	defer func() {
+
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+	go func() {
+		<-ctx.Done()
+
+		timeOut, cancelTimeout := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancelTimeout()
 		consumer.ClosePartition()
 		fmt.Println("Kafka Partition closed")
 		consumer.Close()
 		fmt.Println("Kafka Consumer closed")
+
+		<-timeOut.Done()
+
+		err := db.Close()
+		if err != nil {
+			log.Fatalf("Fail to close database connection: %v", err)
+		}
 	}()
 
-	consumer.Run(skillHandler)
+	consumer.Run(ctx, skillHandler)
 }

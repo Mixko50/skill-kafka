@@ -2,13 +2,10 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/IBM/sarama"
 	"log"
-	"os/signal"
 	"skill-api-kafka-consumer/skill"
-	"syscall"
 )
 
 type Consumer struct {
@@ -49,25 +46,17 @@ func (c *Consumer) ClosePartition() {
 	}
 }
 
-func (c *Consumer) Run(h skill.SkillHandler) {
-	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer cancel()
+func (c *Consumer) Run(ctx context.Context, h skill.SkillHandler) {
 	fmt.Printf("Consuming topic %s at %s.\n", c.topic, c.broker)
 
 ConsumerLoop:
 	for {
 		select {
 		case msg := <-c.partition.Messages():
-			var payload *skill.SkillQueuePayload
 
-			err := json.Unmarshal(msg.Value, &payload)
+			payload, err := h.ValidateSkillMessage(msg.Value)
 			if err != nil {
-				log.Printf("Error unmarshalling message: %s, offset: %d, partition: %d", err, msg.Offset, msg.Partition)
-				continue
-			}
-
-			if payload == nil {
-				log.Printf("Payload is nil, offset: %d, partition: %d", msg.Offset, msg.Partition)
+				log.Printf("Error validating message at topic: %s, partition: %d, offset: %d, error: %s", msg.Topic, msg.Partition, msg.Offset, err)
 				continue
 			}
 

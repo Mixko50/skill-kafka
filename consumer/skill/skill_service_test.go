@@ -51,8 +51,8 @@ func TestSkillService_CreateSkill(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to CreateSkillRequest" {
-			t.Errorf("expected error to be failed to convert payload to CreateSkillRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 
@@ -128,8 +128,8 @@ func TestSkillService_UpdateSkill(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to UpdateSkillRequest" {
-			t.Errorf("expected error to be failed to convert payload to UpdateSkillRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 
@@ -198,8 +198,8 @@ func TestSkillService_UpdateName(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to UpdateSkillNameRequest" {
-			t.Errorf("expected error to be failed to convert payload to UpdateSkillNameRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 
@@ -265,8 +265,8 @@ func TestSkillService_UpdateDescription(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to UpdateSkillDescriptionRequest" {
-			t.Errorf("expected error to be failed to convert payload to UpdateSkillDescriptionRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 
@@ -332,8 +332,8 @@ func TestSkillService_UpdateLogo(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to UpdateSkillLogoRequest" {
-			t.Errorf("expected error to be failed to convert payload to UpdateSkillLogoRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 
@@ -399,8 +399,8 @@ func TestSkillService_UpdateTags(t *testing.T) {
 		})
 
 		// Assert
-		if err.Error() != "failed to convert payload to UpdateSkillTagsRequest" {
-			t.Errorf("expected error to be failed to convert payload to UpdateSkillTagsRequest, got %s", err)
+		if err.Error() != "invalid payload" {
+			t.Errorf("expected error to be invalid payload, got %s", err)
 		}
 	})
 

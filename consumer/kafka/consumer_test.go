@@ -14,8 +14,12 @@ type handlerMock struct {
 	msg string
 }
 
+func (h *handlerMock) ValidateSkillMessage(msg []byte) (*skill.SkillQueuePayload, error) {
+	h.msg = string(msg)
+	return &skill.SkillQueuePayload{}, nil
+}
+
 func (h *handlerMock) HandleSkill(payload *skill.SkillQueuePayload) error {
-	h.msg = string(payload.Action)
 	return nil
 }
 
@@ -28,7 +32,7 @@ func TestConsumer(t *testing.T) {
 	consumerMock := mocks.NewConsumer(t, nil)
 
 	// Set expectation for the partition
-	consumerMock.ExpectConsumePartition("skill", 0, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(`{"action":"create"}`)})
+	consumerMock.ExpectConsumePartition("skill", 0, sarama.OffsetOldest).YieldMessage(&sarama.ConsumerMessage{Value: []byte(`create`)})
 
 	// Start consuming the partition
 	partition, err := consumerMock.ConsumePartition("skill", 0, sarama.OffsetOldest)

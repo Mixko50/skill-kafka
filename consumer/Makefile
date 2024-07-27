@@ -4,7 +4,7 @@ run:
 	go run main.go
 
 test:
-	go test -v ./... -cover
+	go test ./... -cover
 
 build: test
 	docker build -t $(image-name):latest -f ./Dockerfile .

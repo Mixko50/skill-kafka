@@ -7,7 +7,7 @@ test.beforeAll(insertSampleData);
 test.afterAll(deleteData);
 test.afterAll(closeDatabase);
 
-test.describe('GET /todos', () => {
+test.describe('GET /skills/e2e_playwright', () => {
     test('should response todo with status success', async ({request,}) => {
         const res = await request.get(`/api/v1/skills/e2e_playwright`)
         expect(res.ok()).toBeTruthy()

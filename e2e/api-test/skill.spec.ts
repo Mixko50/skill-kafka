@@ -133,3 +133,30 @@ test.describe('PUT /skills/e2e_jest', () => {
             }))
     })
 })
+
+test.describe('PATCH /skills/e2e_jest/actions/name', () => {
+    test('should response skill with status success', async ({request,}) => {
+        const res = await request.patch(`/api/v1/skills/e2e_jest/actions/name`, {
+            data: {
+                "name": "E2E Jest Updated"
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill name already in progress"
+            })
+        )
+
+        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest`)
+        expect(getSkillAPI.ok()).toBeTruthy()
+        expect(await getSkillAPI.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "data": expect.objectContaining({
+                    "name": "E2E Jest Updated",
+                })
+            }))
+    })
+})

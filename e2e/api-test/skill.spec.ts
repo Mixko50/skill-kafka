@@ -160,3 +160,30 @@ test.describe('PATCH /skills/e2e_jest/actions/name', () => {
             }))
     })
 })
+
+test.describe('PATCH /skills/e2e_jest/actions/description', () => {
+    test('should response skill with status success', async ({request,}) => {
+        const res = await request.patch(`/api/v1/skills/e2e_jest/actions/description`, {
+            data: {
+                "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity. Updated"
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill description already in progress"
+            })
+        )
+
+        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest`)
+        expect(getSkillAPI.ok()).toBeTruthy()
+        expect(await getSkillAPI.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "data": expect.objectContaining({
+                    "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity. Updated",
+                })
+            }))
+    })
+})

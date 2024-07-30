@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -22,12 +23,20 @@ func main() {
 
 	db := database.Postgres(c.PostgresURI)
 	storage := skill.NewSkillStorage(db)
-	producer := kafka.Producer(c.Kafka)
+
+	producer, closeKafka := kafka.Producer(c.Kafka)
+	defer closeKafka()
+
 	queue := skill.NewSkillQueue(producer, c.Kafka)
 
 	r := Router(storage, queue)
 
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Println("Error Close DB:", err)
+		}
+	}(db)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()

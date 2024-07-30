@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Producer(c config.KafkaConfig) sarama.SyncProducer {
+func Producer(c config.KafkaConfig) (sarama.SyncProducer, func()) {
 	kafkaConfig := sarama.NewConfig()
 	kafkaConfig.Producer.Return.Successes = true
 	kafkaConfig.Producer.Return.Errors = true
@@ -18,11 +18,6 @@ func Producer(c config.KafkaConfig) sarama.SyncProducer {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	//defer func() {
-	//	if err := producer.Close(); err != nil {
-	//		log.Fatalln(err)
-	//	}
-	//}()
 
 	// Test
 	msg := &sarama.ProducerMessage{Topic: "my-topic-test", Value: sarama.StringEncoder("testing 123")}
@@ -33,5 +28,9 @@ func Producer(c config.KafkaConfig) sarama.SyncProducer {
 		log.Printf("> message sent to partition %d at offset %d\n", partition, offset)
 	}
 
-	return producer
+	return producer, func() {
+		if err := producer.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}
 }

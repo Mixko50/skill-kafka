@@ -187,3 +187,30 @@ test.describe('PATCH /skills/e2e_jest/actions/description', () => {
             }))
     })
 })
+
+test.describe('PATCH /skills/e2e_jest/actions/logo', () => {
+    test('should response skill with status success', async ({request,}) => {
+        const res = await request.patch(`/api/v1/skills/e2e_jest/actions/logo`, {
+            data: {
+                "logo": "https://jestjs.io/img/jest.svg"
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill logo already in progress"
+            })
+        )
+
+        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest`)
+        expect(getSkillAPI.ok()).toBeTruthy()
+        expect(await getSkillAPI.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "data": expect.objectContaining({
+                    "logo": "https://jestjs.io/img/jest.svg",
+                })
+            }))
+    })
+})

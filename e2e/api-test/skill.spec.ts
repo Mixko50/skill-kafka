@@ -1,5 +1,5 @@
-import {expect, test} from '@playwright/test'
-import {closeDatabase, deleteData, insertSampleData, pingDatabase} from '../database/connection';
+import { expect, test } from '@playwright/test'
+import { closeDatabase, deleteData, insertSampleData, pingDatabase } from '../database/connection';
 
 test.beforeAll(pingDatabase);
 test.beforeAll(insertSampleData);
@@ -77,6 +77,45 @@ test.describe('POST /skills', () => {
         const getSkill = await request.get(`/api/v1/skills/e2e_jest`)
         expect(res.ok()).toBeTruthy()
         expect(await getSkill.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "data": expect.objectContaining({
+                    "key": "e2e_jest",
+                    "name": "E2E Jest",
+                    "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
+                    "logo": "https://jestjs.io/img/jest.svg",
+                    "tags": expect.arrayContaining([
+                        "node",
+                        "javascript",
+                        "typescript",
+                        "testing"
+                    ])
+                })
+            }))
+    })
+})
+
+test.describe('PUT /skills/e2e_jest', () => {
+    test('should response skill with status success', async ({request,}) => {
+        const res = await request.put(`/api/v1/skills/e2e_jest`, {
+            data: {
+                "name": "E2E Jest",
+                "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
+                "logo": "https://jestjs.io/img/jest.svg",
+                "tags": ["node", "javascript", "typescript", "testing"]
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill already in progress"
+            })
+        )
+
+        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest`)
+        expect(res.ok()).toBeTruthy()
+        expect(await getSkillAPI.json()).toEqual(
             expect.objectContaining({
                 "status": "success",
                 "data": expect.objectContaining({

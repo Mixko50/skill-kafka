@@ -214,3 +214,36 @@ test.describe('PATCH /skills/e2e_jest/actions/logo', () => {
             }))
     })
 })
+
+test.describe('PATCH /skills/e2e_jest/actions/tags', () => {
+    test('should response skill with status success', async ({request,}) => {
+        const res = await request.patch(`/api/v1/skills/e2e_jest/actions/tags`, {
+            data: {
+                "tags": ["node", "javascript", "typescript", "testing", "updated"]
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill tags already in progress"
+            })
+        )
+
+        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest`)
+        expect(getSkillAPI.ok()).toBeTruthy()
+        expect(await getSkillAPI.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "data": expect.objectContaining({
+                    "tags": expect.arrayContaining([
+                        "node",
+                        "javascript",
+                        "typescript",
+                        "testing",
+                        "updated"
+                    ])
+                })
+            }))
+    })
+})

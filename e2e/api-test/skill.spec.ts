@@ -61,7 +61,7 @@ test.describe('GET /skills', () => {
 })
 
 test.describe('POST /skills', () => {
-    test('should response skill with status success', async ({request}) => {
+    test('should response with status success', async ({request}) => {
         const res = await request.post(`/api/v1/skills`, {
             data: {
                 "key": testDataKey.createSkillKey,
@@ -76,6 +76,90 @@ test.describe('POST /skills', () => {
             expect.objectContaining({
                 "status": "success",
                 "message": "creating skill already in progress"
+            })
+        )
+    })
+})
+
+test.describe('PUT /skills/:key', () => {
+    test('should response with status success', async ({request}) => {
+        const res = await request.put(`/api/v1/skills/` + testDataKey.updateSkillKey, {
+            data: {
+                "name": "E2E Jest",
+                "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
+                "logo": "https://jestjs.io/img/jest.svg",
+                "tags": ["node", "javascript", "typescript", "testing"]
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill already in progress"
+            })
+        )
+    })
+})
+
+test.describe('PATCH /skills/:key/actions/name', () => {
+    test('should response with status success', async ({request}) => {
+        const res = await request.patch(`/api/v1/skills/` + testDataKey.updateNameKey + `/actions/name`, {
+            data: {
+                "name": testDataKey.updateNameKey
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill name already in progress"
+            })
+        )
+    })
+})
+
+test.describe('PATCH /skills/:key/actions/description', () => {
+    test('should response with status success', async ({request}) => {
+        const res = await request.patch(`/api/v1/skills/` + testDataKey.updateDescriptionKey + `/actions/description`, {
+            data: {
+                "description": testDataKey.updateDescriptionKey
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill description already in progress"
+            })
+        )
+    })
+})
+
+test.describe('PATCH /skills/:key/actions/logo', () => {
+    test('should response with status success', async ({request}) => {
+        const res = await request.patch(`/api/v1/skills/` + testDataKey.updateLogoKey + `/actions/logo`, {
+            data: {
+                "logo": testDataKey.updateLogoKey
+            }
+        })
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "updating skill logo already in progress"
+            })
+        )
+    })
+})
+
+test.describe('DELETE /skills/:key', () => {
+    test('should response with status success', async ({request}) => {
+        const res = await request.delete(`/api/v1/skills/` + testDataKey.deleteSkillKey)
+        expect(res.ok()).toBeTruthy()
+        expect(await res.json()).toEqual(
+            expect.objectContaining({
+                "status": "success",
+                "message": "deleting skill already in progress"
             })
         )
     })

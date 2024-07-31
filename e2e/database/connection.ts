@@ -42,7 +42,7 @@ export async function pingDatabase() {
 
 export async function clearDatabase() {
     try {
-        await client.query("DELETE FROM skill")
+        await client.query("DELETE FROM skill where key LIKE 'E2E_%'")
     } catch (error) {
         console.error('Error connecting to database:', error)
     }
@@ -50,15 +50,63 @@ export async function clearDatabase() {
 
 export async function insertSampleData() {
     try {
-        const sampleData = {
-            key: testDataKey.insertSetupKey,
-            name: 'E2E Playwright',
-            description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
-            logo: 'https://playwright.dev/img/playwright-logo.svg',
-            tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+        const sampleData = [
+            {
+                key: testDataKey.insertSetupKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.updateSkillKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.updateNameKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.updateDescriptionKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.updateLogoKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.updateTagsKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            },
+            {
+                key: testDataKey.deleteSkillKey,
+                name: 'E2E Playwright',
+                description: 'Playwright is a Node.js library to automate the Chromium, WebKit, and Firefox browsers with a single API.',
+                logo: 'https://playwright.dev/img/playwright-logo.svg',
+                tags: ['node', 'javascript', 'typescript', 'automation', 'testing']
+            }
+        ]
+
+        for (const data of sampleData) {
+            const insertQuery = 'INSERT INTO skill (key, name, description, logo, tags) values ($1, $2, $3, $4, $5)'
+            await client.query(insertQuery, [data.key, data.name, data.description, data.logo, data.tags])
         }
-        const insertQuery = 'INSERT INTO skill (key, name, description, logo, tags) values ($1, $2, $3, $4, $5)'
-        await client.query(insertQuery, [sampleData.key, sampleData.name, sampleData.description, sampleData.logo, sampleData.tags])
+
         console.log('Inserted sample data')
     } catch (error) {
         console.error('Error connecting to database:', error)

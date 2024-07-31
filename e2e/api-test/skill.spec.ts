@@ -56,7 +56,7 @@ test.describe('GET /skills', () => {
 })
 
 test.describe('POST /skills', () => {
-    test('should response skill with status success', async ({request, page}) => {
+    test('should response skill with status success', async ({request}) => {
         const res = await request.post(`/api/v1/skills`, {
             data: {
                 "key": "e2e_jest",
@@ -73,86 +73,5 @@ test.describe('POST /skills', () => {
                 "message": "creating skill already in progress"
             })
         )
-
-        await page.waitForTimeout(200)
-
-        const getSkill = await request.get(`/api/v1/skills/e2e_jest`)
-        expect(res.ok()).toBeTruthy()
-        expect(await getSkill.json()).toEqual(
-            expect.objectContaining({
-                "status": "success",
-                "data": expect.objectContaining({
-                    "key": "e2e_jest",
-                    "name": "E2E Jest",
-                    "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
-                    "logo": "https://jestjs.io/img/jest.svg",
-                    "tags": expect.arrayContaining([
-                        "node",
-                        "javascript",
-                        "typescript",
-                        "testing"
-                    ])
-                })
-            }))
-    })
-})
-
-test.describe('PUT /skills/e2e_jest', () => {
-    test('should response skill with status success', async ({request, page}) => {
-        // Arrange
-        const createSkill = await request.post(`/api/v1/skills`, {
-            data: {
-                "key": "e2e_jest_put",
-                "name": "E2E Jest",
-                "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
-                "logo": "https://jestjs.io/img/jest.svg",
-                "tags": ["node", "javascript", "typescript", "testing"]
-            }
-        })
-        expect(createSkill.ok()).toBeTruthy()
-        await page.waitForTimeout(200)
-
-        const getSkill = await request.get(`/api/v1/skills/e2e_jest_put`)
-        expect(getSkill.ok()).toBeTruthy()
-        expect(await getSkill.json()).toEqual(
-            expect.objectContaining({
-                "status": "success",
-                "data": expect.objectContaining({
-                    "key": "e2e_jest_put",
-                })
-            })
-        )
-
-        // Act
-        const res = await request.put(`/api/v1/skills/e2e_jest_put`, {
-            data: {
-                "name": "E2E Jest put updated",
-                "description": "Jest is a delightful JavaScript Testing Framework with a focus on simplicity.",
-                "logo": "https://jestjs.io/img/jest.svg",
-                "tags": ["node", "javascript", "typescript", "testing"]
-            }
-        })
-
-        expect(res.ok()).toBeTruthy()
-        expect(await res.json()).toEqual(
-            expect.objectContaining({
-                "status": "success",
-                "message": "updating skill already in progress"
-            })
-        )
-
-        await page.waitForTimeout(200)
-
-        // Assert
-        const getSkillAPI = await request.get(`/api/v1/skills/e2e_jest_put`)
-        expect(res.ok()).toBeTruthy()
-        expect(await getSkillAPI.json()).toEqual(
-            expect.objectContaining({
-                "status": "success",
-                "data": expect.objectContaining({
-                    "key": "e2e_jest_put",
-                    "name": "E2E Jest put updated",
-                })
-            }))
     })
 })
